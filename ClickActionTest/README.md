@@ -14,7 +14,9 @@ iPadのmobileブラウザでボタンクリックイベントが妙にもたつ�
 
 Clickイベントが発火してますので、それに対する対応も必要です。
 
-@HostLitnerでイベントを補足し、targetのクリックイベントを発火させることで回避を行ってみます。
+@HostLitnerでイベントを補足し
+
+targetのクリックイベントを発火させることで回避を行ってみました。
 
 [素HTML+TypeScript] https://jsfiddle.net/TKS0522/j9bgvm56/2/
 
