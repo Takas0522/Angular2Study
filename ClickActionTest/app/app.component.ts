@@ -27,6 +27,10 @@ export class AppComponent {
         this.imageInput();
     }
 }
+private elementRefTest(){
+  var elements = this._elementRef.nativeElement.querySelectorAll(".txt-fields");
+  console.log(elements);
+} 
   imageInput(){
     var input = 
       this._elementRef.nativeElement.querySelector("#fileInput");
