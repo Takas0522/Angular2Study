@@ -1,0 +1,11 @@
+AspPlusAngular/AspPlusAngular/node_modules/
+AspPlusAngular/AspPlusAngular/src/**/*.js
+AspPlusAngular/AspPlusAngular/src/**/*.map
+AspPlusAngular/AspPlusAngular/src/**/*.map
+AspPlusAngular/AspPlusAngular/Scripts
+AspPlusAngular/AspPlusAngular/public/css**/*.css
+AspPlusAngular/AspPlusAngular/bin
+AspPlusAngular/AspPlusAngular/obj
+AspPlusAngular/.vs
+AspPlusAngular/packages
+AspPlusAngular/debug.log
