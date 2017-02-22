@@ -10,21 +10,17 @@ import {Component, OnInit} from "@angular/core";
     <div *ngFor="let item of showArray">
         {{item.code}} / {{item.name}}
     </div>
-    <select [(ngModel)]="selectedValue"
-            (ngModelChange)="onSelectedValueChange()">
-        <option *ngFor="let item of selectArray"
-                [value]="item.code">
-            {{item.name}}
-        </option>
+    <select [(ngModel)]="levelNum" (change)="log()" >
+      <option *ngFor="#level of levels" [value]="level.num">{{ level.name }} -  {{ type(level.num) }}</option>
+    </select>
     </select>
     `
 })
 export class NgForComponent implements OnInit{
     private showArray: SampleArray[] = [{code: 1, name:"TKS0522"}, {code: 2, name: "HogeHoge"},{code: 3, name:"FugaFuga"}];
     private selectArray: SampleArray[] = [{code: 10, name:"AAA"}, {code: 20, name: "BBB"},{code: 30, name:"CCC"}];
-    private selectedValue: number;
+    private selectedValue: number = 10;
     ngOnInit(){
-        this.selectedValue = 10;
         /*JSON Value nothing "double quate"*/
         let jsonData = JSON.stringify(this.selectedValue);
         console.log(jsonData);
