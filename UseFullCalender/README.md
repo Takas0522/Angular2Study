@@ -11,11 +11,14 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app w
 ## 参考
 https://gearheart.io/blog/how-to-include-jquery-plugins-in-angular-2-running-via-webpack/
 
-## jqueryをAngular-cliで使いたい
+## jQueyプラグインをAngular2で使いたい(FullCalendar)
+
+上記の記事の焼き直しみたいな感じになっていますが
+
+今回はangular-cliを使用して、作ってみようと思います。
+
+ngular-cliの使い方は下記を参考にどうぞ。
+
 https://www.npmjs.com/package/angular-cli
 
-Angular-cliでjqueryのビルドを通すために、[.angular-cli.json]の[scripts]に下記を追加します。
-
-``` json
-"../node_modules/jquery/dist/jquery.js"
-```
+https://developers.eure.jp/tech/begin_angular_cli/
