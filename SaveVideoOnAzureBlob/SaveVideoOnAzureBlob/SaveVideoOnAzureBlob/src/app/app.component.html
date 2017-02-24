@@ -1,0 +1,12 @@
+﻿<main>
+    <div>
+        動画をアップロード
+        <input type='file' accept='video/*' (change)="onChangeInput($event)" />
+    </div>
+    <div>
+        既にAzure上に存在するやつ
+    </div>
+    <div *ngFor="let item of fileLists">
+        <my-video [src]="item" (requestPlayback)="onVideoRequestPlayback($event)"></my-video>
+    </div>
+</main>
