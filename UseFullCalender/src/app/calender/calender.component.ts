@@ -65,23 +65,16 @@ export class CalenderComponent implements AfterViewInit {
         };
         this.calendarElement.fullCalendar('renderEvent', eventData, true);
         this.calendarElement.fullCalendar('unselect');
-        this.runDatabaseUpdate(eventData);
     }.bind(this);
 
     private onDropFunction = function(event: FC.EventObject){
         console.log('Drop!');
         console.log(event);
-        this.runDatabaseUpdate(event);
     }.bind(this);
 
     private onReSizeFunction = function(event: FC.EventObject){
         console.log('ReSize!');
         console.log(event);
-        this.runDatabaseUpdate(event);
     }.bind(this);
 
-    private runDatabaseUpdate(data: FC.EventObject){
-        alert('DBへ更新を行う処理を実行するよ！');
-        console.log(data);
-    }
 }

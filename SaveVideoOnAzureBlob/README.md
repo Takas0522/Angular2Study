@@ -3,9 +3,9 @@ YouTube等の外部Serviceを使用してもいいですが
 Privateな環境でVideoのアップロードをしたい場合があります
 (業務利用ぐらいしか思いつきませんが。
 
-MSのMediaService等を使っても良いかもしれませんが
+AzureのMediaService等を使っても良いかもしれませんが
 
-AzureのBlobStorageServiceを使用すれば
+同じくAzureのBlobStorageServiceを使用すれば
 
 手っ取り早くプライベートな環境でビデオのアップロード＆視聴が可能となります。
 
@@ -16,9 +16,11 @@ Angular+ASP.netで動画ファイルのアップロードと視聴ページの�
 
 CORS(クロスオリジンリソース共有)を設定します。
 
-下記のサイトでは、ソースコードで設定の変更を行っていますが
+BLOBのUpdateのための設定です。
 
-AzureのPortal上からも変更できます。
+参考にしたサイトでは、ソースコードで設定の変更を行っていますが
+
+AzureのPortal上からも変更できるようです。
 
 https://tech-blog.cloud-config.jp/2014/08/15/upload-the-data-to-the-azure-blob-storage-in-javascript/
 
@@ -36,11 +38,7 @@ https://docs.microsoft.com/ja-jp/azure/storage/storage-cors-support
 
 ![Azureのリソースグループ](./img/3.jpg)
 
-4. 下記URLの内容をもとに、CORSの設定を行う
-
-https://docs.microsoft.com/ja-jp/azure/storage/storage-cors-support
-
-https://tech-blog.cloud-config.jp/2014/08/15/upload-the-data-to-the-azure-blob-storage-in-javascript/
+4. 上記の参考URLの内容をもとに、CORSの設定を行う
 
 ![Azureのリソースグループ](./img/4.jpg)
 
@@ -56,16 +54,22 @@ ASP.Netはアップロードファイルの上限がデフォルト4MBとなっ�
 
 http://tarcvf.blogspot.jp/2013/07/aspnet.html
 
+web.config
+```
+<httpRuntime targetFramework="4.5.2" maxRequestLength="102400" />
+```
 
 # Webページからのファイルのアップロード
 
 # WebAPIへのアップロード
 
-http://www.c-sharpcorner.com/article/angular-2-file-upload-using-web-api/
-
-type=fileでaccept='video/*'であれば、取得対象が動画ファイルとなります。
+inputタグの[type=file accept='video/*']であれば、取得対象が動画ファイルとなります。
 
 (change)でファイル変更時のイベントを補足し、WebAPIにファイルを送る処理を実装します。
+
+[参考]
+http://www.c-sharpcorner.com/article/angular-2-file-upload-using-web-api/
+
 
 ``` html
 <input type='file' accept='video/*' (change)="onChangeInput($event)" />
@@ -82,7 +86,7 @@ private onChangeInput(el: any) {
     });
 }
 //----------------------------------------------------------
-//web-api
+//webapiに送る処理
 putUploadFile(formData: FormData): Observable<any> {
     return this.postFileData<any>("api/FileOperation", formData);
 }
@@ -91,6 +95,7 @@ putUploadFile(formData: FormData): Observable<any> {
 WebApiではFormデータを送信する
 
 ``` typescript
+//httpのPostリクエストでファイルを送信
 private postFileData<T>(url: string, sendData: FormData) {
     return this.http
         .post(url, sendData, <headersContent>)
@@ -104,7 +109,7 @@ private postFileData<T>(url: string, sendData: FormData) {
 
 ## WebAPIからAzureにBlobデータを登録する
 
-ControllerではPOSTされたデータから
+ASPのControllerではPOSTされたデータから
 
 HttpResponseMessageでファイル情報等を抜き出します。
 
@@ -119,7 +124,7 @@ public async Task<HttpResponseMessage> Post()
         foreach (string file in httpRequest.Files)
         {
             var postedFile = httpRequest.Files[file];
-            /*Azureの登録処理へ*/
+            /*→Azureの登録処理へ→*/
         }
     }
     return response;
@@ -135,11 +140,13 @@ var blobClient = storageAccount.CreateCloudBlobClient();
 container = blobClient.GetContainerReference(<CONTAINER_NAME>);
 container.CreateIfNotExists();
 ```
+[参考]
+
 http://gooner.hateblo.jp/entry/2014/03/10/blob/
 
-APIではファイルはByte[]で渡すので、
+AzureのAPIはファイルはByte[]引数となりますので
 
-httpRequestのFileのStream型をByte[]に変換してAPIに渡します。
+httpRequestのFileのStream型をByte[]型に変換してAzureのAPIに渡します。
 
 GetBlockBlobReferenceでAzureにUpload出来る形にした後
 
@@ -162,6 +169,8 @@ await blob.UploadFromByteArrayAsync(sendByteData, 0, sendByteData.Length);
 BlobへのアクセスはShared Access Signature (SAS) で作成したURLを返却します。
 
 期間限定で、APIキーの譲渡なしにデータアクセス出来るようになるそうです。
+
+[参考]
 
 http://stackoverflow.com/questions/19655868/streaming-video-from-azure-blob-storage
 
@@ -197,3 +206,7 @@ http://stackoverflow.com/questions/42185584/play-only-one-video-simultaneously
     Your browser does not support the video tag.
 </video>
 ```
+
+# 結果
+こんな感じになります。
+
