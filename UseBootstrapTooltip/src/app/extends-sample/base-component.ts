@@ -30,14 +30,14 @@ export class BaseComponent implements ComponentInterface {
                         }
                     }
                     if (this.fromErrors[field]) {
-                        this.validatedErrorsACtion(this.fromErrors[field]);
+                        this.validatedErrorsAction(this.fromErrors[field]);
                     }
                 }
             }
         }
     }
 
-    validatedErrorsACtion(errors: any) {
+    validatedErrorsAction(errors: any) {
         /* 継承先のコンポーネントで実装してくださいな */
     }
 }

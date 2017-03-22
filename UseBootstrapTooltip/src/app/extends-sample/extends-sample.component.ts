@@ -57,7 +57,7 @@ export class ExtendsSampleComponent extends BaseComponent implements OnInit, Com
     }
 
     /* Validationエラー時処理を実装 */
-    validatedErrorsACtion(errors: any) {
+    validatedErrorsAction(errors: any) {
         console.log(errors);
     }
     /* SUBMIT */
