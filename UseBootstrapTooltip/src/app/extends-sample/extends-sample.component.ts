@@ -2,19 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { Validators, FormGroup, FormBuilder  } from '@angular/forms';
 
 import { BaseComponent } from './base-component';
+import { ComponentInterface } from './interface-component'
 
 @Component({
     selector: 'extends-sample',
     templateUrl: './extends-sample.html'
 })
-export class ExtendsSampleComponent extends BaseComponent implements OnInit {
+export class ExtendsSampleComponent extends BaseComponent implements OnInit, ComponentInterface {
     /* コンストラクタ */
     constructor(
         private _fb: FormBuilder
     ) {
         super();
     }
-
+    isActionValidationCheck: boolean = false;
     /* Validator処理 */
     fromErrors: any = {
         'userid': '',
@@ -55,6 +56,10 @@ export class ExtendsSampleComponent extends BaseComponent implements OnInit {
         this.buidForm();
     }
 
+    /* Validationエラー時処理を実装 */
+    validatedErrorsACtion(errors: any) {
+        console.log(errors);
+    }
     /* SUBMIT */
     private onSubmit() {
         console.log('submit');

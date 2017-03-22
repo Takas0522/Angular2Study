@@ -1,9 +1,12 @@
 import { Validators, FormGroup, FormBuilder  } from '@angular/forms';
-export class BaseComponent {
+
+import { ComponentInterface } from './interface-component';
+export class BaseComponent implements ComponentInterface {
     /* Validator処理 */
     fromErrors: any = {};
     validationMessages: any = {};
     inputForm: FormGroup;
+    isActionValidationCheck = false;
     buidForm() {
         this.inputForm.valueChanges.subscribe( data => {
             this.onValueChanged(data);
@@ -27,10 +30,14 @@ export class BaseComponent {
                         }
                     }
                     if (this.fromErrors[field]) {
-                        console.log(this.fromErrors[field]);
+                        this.validatedErrorsACtion(this.fromErrors[field]);
                     }
                 }
             }
         }
+    }
+
+    validatedErrorsACtion(errors: any) {
+        /* 継承先のコンポーネントで実装してくださいな */
     }
 }
