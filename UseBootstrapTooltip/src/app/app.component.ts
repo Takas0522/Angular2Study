@@ -45,7 +45,7 @@ export class AppComponent implements OnInit  {
             }
             if (this.formErrors[field]) {
               // エラー時処理 //
-              console.log(this.formErrors[field]);
+              this.userTooltip.open();
             }
           }
         }
