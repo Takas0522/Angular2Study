@@ -1,0 +1,15 @@
+<div *ngIf="formErrors" class="alert alert-danger" id="errorfield">
+    {{ errorMessage }}
+</div>
+<div class="form-group">
+    <label for="userid">UserId</label>
+    <input type="text" id="userid" class="form-control" [(ngModel)]="userId" />
+</div>
+
+<div class="form-group">
+    <label for="password">Password</label>
+    <input type="text" id="password" class="form-control" />
+</div>
+<button type="submit" class="btn btn-default">
+    ログイン
+</button>
