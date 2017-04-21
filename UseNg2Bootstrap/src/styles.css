@@ -1,0 +1,5 @@
+/* You can add global styles to this file, and also import other style files */
+.input-validation-error {
+    background-color: #f7e5e3;
+    border: 1px solid #e51400;
+}
