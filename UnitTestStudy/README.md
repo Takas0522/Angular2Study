@@ -44,7 +44,8 @@ AngularはVer.4でお送りします。
 * エラー情報表示フィールド
 
 機能
-* ユーザーIDとパスワードはRequiredのエラーチェックをVerificationで
+* ユーザーIDとパスワードはRequiredのエラーチェックをVerificationで行う。
+* ID/PASSともにLoweCaseで登録されているので、APIへのSend時にLowerCaseにインクリメントする
 * ログイン時にAPIと通信してID/Passが一致するかのチェックを行う
 * エラーが発生している場合はエラー情報表示フィールドにエラー情報を表示する
 * ログイン成功したらページ繊維する
@@ -93,7 +94,7 @@ export class LoginComponent {
 }
 ```
 
-雑い
+雑
 
 # テスト用のHTMLエレメントの生成
 
@@ -135,15 +136,15 @@ class Page {
 
 beforeEach()内でテストで使用する諸々の設定を行います。
 
-この時に、先ほど作成した、ページ情報の作成も行います。
+この時に、先ほど作成したクラスで、テストページの作成も行います。
 
 現状、テストが認識できればいいので、適当に生成していきます。
 
-また、Angularの起動起点となるModuleをインポートしなければいけません。
+Angularの起動起点となるModuleをインポートしなければいけません。
 
 テストを記述してみます。
 
-画面が初回に表示された際のテストです。
+まずは、画面が初回に表示された際のテストです。
 
 画面に表示されている内容は、生成されたPageClassのエレメントのコントロール変数から取得します。
 
@@ -158,7 +159,6 @@ describe('ログインComponent', () => {
     describe('モジュールのSetUp', moduleSetup);
 });
 
-///
 function moduleSetup() {
     beforeEach(async(() => {
         // テストの準備を行う。モジュールを読む
@@ -183,10 +183,10 @@ function moduleSetup() {
 // Componentの作成
 function createComponent() {
     
-    // LoginComponentの生成(TestBedにのせる（表現あってるのかな？）)
+    // LoginComponentの生成(TestBedにのせる（「のせる」って表現あってるのかな？）)
     fixture = TestBed.createComponent(LoginComponent);
 
-    // 生成されたComponentのインスタンスｗｐ取得
+    // 生成されたComponentのインスタンスを取得
     comp = fixture.componentInstance;
 
     // ページを作成
@@ -216,9 +216,7 @@ class Page {
 }
 ```
 
-テストを行っているのは下記の箇所です。
-
-it以下でテストを行っています。
+テストを行っているのはit以下で、下記の箇所です。
 
 ```typescript
 it ('初回Initialize空文字チェック', () => {
@@ -227,9 +225,9 @@ it ('初回Initialize空文字チェック', () => {
 });
 ```
 
-idInput/passwordInputが画面の項目にあたります。
+idInput/passwordInputがPageClassで生成される画面の項目にあたります。
 
-初回のため、から状態なので、このテストは通ります。
+初回のため、空状態なので、このテストは通ります。
 
 結果を見てみましょう。
 
@@ -263,10 +261,6 @@ Inputは下記のように変更し、対応する変数をComponentに反映す
 <input type="text" id="userid" class="form-control" [(ngModel)]="userId" />
 ```
 
-ログインページの場合、双方向のバインディングは過多な機能かもですが
-
-テーマ的に双方でバインディングするようにしています。
-
 テストはどのように記述するのでしょうか？
 
 その場合は、Componentが乗っているTestBedの変更検知（DetectChange）を発火します。
@@ -282,7 +276,7 @@ it ('バインドテスト（HTML -> ComponentMember）', () => {
     page.idInput.dispatchEvent(newEvent('input'));
     // 変更を通知
     fixture.detectChanges();
-    expect(page.idInput.value).toBe(inputString, 'userId');
+    expect(comp.loginUser.userId).toBe(inputString, 'userId');
 });
 ```
 
@@ -290,7 +284,7 @@ it ('バインドテスト（HTML -> ComponentMember）', () => {
 
 newEventのファンクションは、Angularのリファレンスからそのまま流用しているものを使用しています。
 
-inputされた際のイベントを強制的に発火させ、Angularの変更検知に検知させているのかと思われます。
+inputされた際のイベントを発火させ、Angularの変更検知に検知させているのかと思われます。
 
 ``` typescript
 export function newEvent(eventName: string, bubbles = false, cancelable = false) {
@@ -303,3 +297,179 @@ export function newEvent(eventName: string, bubbles = false, cancelable = false)
 今回はComponentのみでテストを行ってみました。
 
 次はInjectするClassを用いて、テストを行ってみます。
+
+# サービスClass単体のテスト
+
+何かしらのサービスクラスみたいなものを作ったとします。
+
+過剰な気はしますが、ログイン情報をLoweCaseにするサービスがあったとします。
+
+クラスとしてはこのような感じですかね。
+
+``` typescript
+@Injectable()
+export class LoginService {
+    changeLowerCase(loginUser: LoginUser): LoginUser {
+        return {
+            userId: loginUser.userId.toLowerCase(),
+            password: loginUser.password.toLowerCase()
+        }
+    }
+}
+```
+
+テストを作成する際、Class単体をテストする場合は、シンプルな形でテストできます。
+
+``` typescript
+describe('サービステスト', () => {
+    let _service: LoginService;
+
+    beforeEach(() => {
+        _service = new LoginService();
+    });
+
+    describe('lowercaseテスト', () => {
+        it ('全部小文字', () => {
+            let testData:LoginUser = { userId: 'abc', password: 'def' };
+            let res = _service.changeLowerCase(testData);
+            expect(res).toEqual(testData);
+        });
+        it ('全部大文字', () => {
+            let testData:LoginUser = { userId: 'ABC', password: 'DEF' };
+            let res = _service.changeLowerCase(testData);
+            expect(res.userId).toEqual('abc');
+            expect(res.password).toEqual('def');
+        });
+    });
+});
+```
+
+単純にServiceのインスタンスを生成して実行するだけです。
+
+# formValidationを伴うテスト
+
+https://angular.io/docs/ts/latest/cookbook/form-validation.html
+
+上記のReacti1veのパターンを使用した場合のテストを記述してみます。
+
+結果、バインド部分で失敗します。
+
+と、いうのもコントロールで入力された値はForumbuiderのメンバ変数のValueに格納されるためです。
+
+と、このように機能の変更によるデグレを発見することができました。
+
+テストを変更するか、実装を変更するかは実際にソースに左右されると思います。
+
+ひとまずテストを変更するとこのような形でテストが通るようになります。
+
+``` typescript
+it ('バインドテスト（HTML -> ComponentMember）', () => {
+    // 登録する値
+    const inputString = "HogeHoge";
+    // 画面の項目に値を入力
+    page.idInput.value = inputString;
+    page.idInput.dispatchEvent(newEvent('input'));
+    // 変更を通知
+    fixture.detectChanges();
+    expect(comp.inputForm.value.userId).toBe(inputString, 'userId');
+});
+```
+
+# Spyテスト
+
+さて、Login処理は最終的にWebAPIで認証処理が行われます。
+
+ただ、WebAPIの処理はまだ作成していませんし
+
+WebAPIが絶対にないとテストできないというのは利便性にかけます。
+
+WebAPIとのやりとりをサービスクラスで分離し、LoginComponentからProvideしているとした場合
+
+APIの処理を別の処理にすげかえることにより、APIの有無に関わらずテストが実行可能となります。
+
+例えば、下記のようなAPIとの通信を行うサービスがあります。
+
+``` typescript
+export class LoginApi {
+    constructor(
+        private _api: WebApi
+    ) {}
+    loginAction(param: LoginUser): Observable<Result> {
+        return this._api.postData('api/login', param);
+    }
+}
+```
+
+上記をComponentで下記のように使用しています。
+
+``` typescript
+onSubmit() {
+    this._api.loginAction(this.loginUser).subscribe(data =>{
+        if (data.result) {
+            //何かしらの処理
+        }
+    });
+}
+```
+
+テストを記述する際
+
+ComponentからProvideしているサービスはSpyを使用するようすげ替えます。
+
+Spyクラスは下記のように作成してみました。
+
+``` typescript
+class LoginApiSpy {
+    readonly users: LoginUser[] = [
+        {userId: 'a', password: 'a'},
+        {userId: 'b', password: 'b'}
+    ]
+    
+    readonly successResult: Result = {
+        result: true, 
+        message: ''
+    };
+    readonly failedResult: Result = {
+        result: false, 
+        message: 'ERR'
+    };
+
+    loginAction(param: LoginUser): Observable<Result> {
+        let data = this.users.filter(x => x.userId === param.userId && x.password === param.password );
+        if (data) {
+            return Observable.of(this.successResult);
+        } else {
+            return Observable.of(this.failedResult);
+        }
+    }
+}
+```
+
+APIの処理（loginAction）を内部で完結するように変更を行っています。
+
+Observableでの返却は.ofを使用して返却しています。
+
+このSpyClassを使用することを、Specファイルで記述しなくてはなりません。
+
+BeforeEachでの記述が下記のようになります。
+
+「LoginService」は外部に依存する処理が存在しないためそのまま使用しています。
+
+``` typescript
+beforeEach(async(() => {
+    // テストの準備を行う。モジュールを読む
+    TestBed.configureTestingModule({
+        imports: [AppModule]
+    })
+    .overrideComponent(LoginComponent, {
+        set: {
+            providers:[
+                // provieするLoginApiをSpyクラスで代替
+                {provide: LoginApi, useClass: LoginApiSpy},
+                {provide: LoginService, useClass: LoginService }
+            ]
+        }
+    })
+    .compileComponents();
+}));
+```

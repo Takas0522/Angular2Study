@@ -1,10 +1,15 @@
 import { ComponentFixture, TestBed, async } from '@angular/core/testing';
 import { By }              from '@angular/platform-browser';
 import { DebugElement }    from '@angular/core';
+import { ReactiveFormsModule }    from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import { AppModule } from '../../app.module';
 import { LoginComponent } from '../login.component';
-import { newEvent } from '../../testing/test-utility';
+import { newEvent, click } from '../../testing/test-utility';
+import { LoginUser } from '../LoginUser';
+import { LoginApi, Result } from '../login.api';
+import { LoginService } from '../login.service';
 
 let fixture: ComponentFixture<LoginComponent>
 let comp: LoginComponent;
@@ -20,6 +25,14 @@ function moduleSetup() {
         // テストの準備を行う。モジュールを読む
         TestBed.configureTestingModule({
             imports: [AppModule]
+        })
+        .overrideComponent(LoginComponent, {
+            set: {
+                providers:[
+                    {provide: LoginApi, useClass: LoginApiSpy},
+                    {provide: LoginService, useClass: LoginService }
+                ]
+            }
         })
         .compileComponents();
     }));
@@ -41,8 +54,23 @@ function moduleSetup() {
             page.idInput.dispatchEvent(newEvent('input'));
             // 変更を通知
             fixture.detectChanges();
-            expect(page.idInput.value).toBe(inputString, 'userId');
+            expect(comp.inputForm.value.userId).toBe(inputString, 'userId');
         });
+    });
+    describe('アクションテスト', () => {
+        beforeEach(async() => {
+            createComponent();
+        });
+        it ('Login実行テスト(エラー条件)', ()=> {
+            page.addPageElements();
+            page.idInput.value = 'a';
+            page.idInput.dispatchEvent(newEvent('input'));
+            page.passwordInput.value = 'b';
+            page.passwordInput.dispatchEvent(newEvent('input'));
+            click(page.loginButton);
+            page.addPageElements();
+            expect(page.errorField.innerText).toEqual('ID/Passwordが一致しません');
+        })
     });
 }
 
@@ -63,11 +91,33 @@ function createComponent() {
     });
 }
 
+class LoginApiSpy {
+    readonly users: LoginUser[] = [
+        {userId: 'a', password: 'a'},
+        {userId: 'b', password: 'b'}
+    ]
+    
+    readonly successResult: Result = {result: true, message: ''};
+    readonly failedResult: Result = {result: false, message: 'ERR'};
+
+    loginAction(param: LoginUser): Observable<Result> {
+        console.log(param);
+        let data = this.users.filter(x => x.userId === param.userId && x.password === param.password );
+        if (data) {
+            return Observable.of(this.successResult);
+        } else {
+            return Observable.of(this.failedResult);
+        }
+    }
+}
+
 class Page {
     navSpy: jasmine.Spy;
     loginButton: DebugElement;
     idInput: HTMLInputElement;
     passwordInput: HTMLInputElement;
+    errorFieldUserId: HTMLElement;
+    errorFieldPassword: HTMLElement;
     errorField: HTMLElement;
 
     addPageElements() {
@@ -75,7 +125,13 @@ class Page {
         this.loginButton = fixture.debugElement.query(By.css('button')).nativeElement;
         this.idInput = fixture.debugElement.query(By.css('#userid')).nativeElement;
         this.passwordInput = fixture.debugElement.query(By.css('#password')).nativeElement;
-        if (comp.formErrors) {
+        if (comp.formErrors.userId) {
+            this.errorFieldUserId = fixture.debugElement.query(By.css('#errorfielduserid')).nativeElement;
+        }
+        if (comp.formErrors.password) {
+            this.errorField = fixture.debugElement.query(By.css('#errorfieldpassword')).nativeElement;
+        }
+        if (comp.errorMessage) {
             this.errorField = fixture.debugElement.query(By.css('#errorfield')).nativeElement;
         }
     }

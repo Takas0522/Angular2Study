@@ -1,15 +1,33 @@
-<div *ngIf="formErrors" class="alert alert-danger" id="errorfield">
-    {{ errorMessage }}
-</div>
-<div class="form-group">
-    <label for="userid">UserId</label>
-    <input type="text" id="userid" class="form-control" [(ngModel)]="userId" />
-</div>
+<form
+    [formGroup]="inputForm"
+    (ngSubmit)="onSubmit()">
+    <div class="form-group">
+        <label for="userid">UserId</label>
+        <input 
+            type="text" 
+            id="userid"
+            class="form-control" 
+            formControlName="userId" />
+        <div *ngIf="formErrors.userId" class="alert alert-danger" id="errorfielduserid">
+            {{formErrors.userId}}
+        </div>
+    </div>
 
-<div class="form-group">
-    <label for="password">Password</label>
-    <input type="text" id="password" class="form-control" />
-</div>
-<button type="submit" class="btn btn-default">
-    ログイン
-</button>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+            type="text" 
+            id="password" 
+            class="form-control" 
+            formControlName="password" />
+        <div *ngIf="formErrors.password" class="alert alert-danger" id="errorfieldpassword">
+            {{formErrors.password}}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-default">
+        ログイン
+    </button>
+    <div *ngIf="errorMessage" class="alert alert-danger" id="errorfield">
+        {{errorMessage}}
+    </div>
+</form>

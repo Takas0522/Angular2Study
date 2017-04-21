@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
+import { WebApi } from './common/webapi';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,9 @@ import { LoginComponent } from './login/login.component';
     ReactiveFormsModule,
     HttpModule
   ],
-  providers: [],
+  providers: [
+    WebApi
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
