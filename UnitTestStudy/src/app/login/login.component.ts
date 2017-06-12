@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { LoginUser } from './LoginUser'
 import { LoginService } from './login.service'
@@ -38,7 +39,8 @@ export class LoginComponent implements OnInit {
     constructor(
         private _fb: FormBuilder,
         private _api: LoginApi,
-        private _service: LoginService
+        private _service: LoginService,
+        private _router: Router
     ) {}
 
     ngOnInit(){
@@ -79,9 +81,9 @@ export class LoginComponent implements OnInit {
     onSubmit() {
         this._api.loginAction(this.loginUser).subscribe(data =>{
             if (data.result) {
-                //hogehoge
+                this._router.navigateByUrl("home");
             } else  {
-                this.errorMessage = 'ID/Passwordが一致しません';
+                this._errorMessage = 'ID/Passwordが一致しません';
             }
         });
     }

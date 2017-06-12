@@ -1,6 +1,7 @@
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { ComponentFixture, TestBed, async, inject } from '@angular/core/testing';
 import { By }              from '@angular/platform-browser';
 import { DebugElement }    from '@angular/core';
+import { Router } from '@angular/router';
 import { ReactiveFormsModule }    from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -24,7 +25,10 @@ function moduleSetup() {
     beforeEach(async(() => {
         // テストの準備を行う。モジュールを読む
         TestBed.configureTestingModule({
-            imports: [AppModule]
+            imports: [AppModule],
+            providers: [
+                { provide: Router, useClass: RouterStub }
+            ]
         })
         .overrideComponent(LoginComponent, {
             set: {
@@ -57,7 +61,7 @@ function moduleSetup() {
             expect(comp.inputForm.value.userId).toBe(inputString, 'userId');
         });
     });
-    describe('アクションテスト', () => {
+    describe('アクションテスト(ERR)', () => {
         beforeEach(async() => {
             createComponent();
         });
@@ -68,9 +72,29 @@ function moduleSetup() {
             page.passwordInput.value = 'b';
             page.passwordInput.dispatchEvent(newEvent('input'));
             click(page.loginButton);
+            Observable.of('')
+            .delay(1000).subscribe(() => {
+                page.addPageElements();
+                expect(page.errorField.innerText).toEqual('ID/Passwordが一致しません');
+            });
+        });
+    });
+    describe('アクションテスト', () => {
+        beforeEach(async() => {
+            createComponent();
+        });
+        it ('Login実行テスト(成功)',
+            inject([Router], (router: Router)=> {
+            const spy = spyOn(router, 'navigateByUrl')
             page.addPageElements();
-            expect(page.errorField.innerText).toEqual('ID/Passwordが一致しません');
-        })
+            page.idInput.value = 'a';
+            page.idInput.dispatchEvent(newEvent('input'));
+            page.passwordInput.value = 'a';
+            page.passwordInput.dispatchEvent(newEvent('input'));
+            click(page.loginButton);
+            const navArgs = spy.calls.first().args[0];
+            expect(navArgs).toBe('/home/');
+        }));
     });
 }
 
@@ -103,12 +127,16 @@ class LoginApiSpy {
     loginAction(param: LoginUser): Observable<Result> {
         console.log(param);
         let data = this.users.filter(x => x.userId === param.userId && x.password === param.password );
-        if (data) {
+        if (data && data.length > 0) {
             return Observable.of(this.successResult);
         } else {
             return Observable.of(this.failedResult);
         }
     }
+}
+
+class RouterStub {
+    navigateByUrl(url:string) {return url;}
 }
 
 class Page {
