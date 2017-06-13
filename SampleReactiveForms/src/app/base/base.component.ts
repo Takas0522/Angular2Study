@@ -2,16 +2,10 @@ import { FormGroup, FormBuilder } from '@angular/forms'
 
 export class BaseComponent {
     inputForm: FormGroup;
-    formSettings: any;
     formErrors: any;
     validationMessage: any;
 
-    constructor(
-        private fb: FormBuilder
-    ) {}
-
     buildForms() {
-        this.fb.group(this.formSettings);
         this.inputForm.valueChanges.subscribe(data => {
             this.onValueChange(data);
         });
