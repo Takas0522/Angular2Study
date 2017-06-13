@@ -1,26 +1,24 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MdInputModule } from '@angular/material';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { WebApi } from './common/webapi';
+import 'hammerjs';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    LoginComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    ReactiveFormsModule,
-    HttpModule
+    HttpModule,
+    BrowserAnimationsModule,
+    MdInputModule
   ],
-  providers: [
-    WebApi
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
