@@ -37,4 +37,16 @@ export class BaseComponent {
     emitNotErrorAction(field: any){
         /* エラー未発生時処理、継承先で実装 */
     }
+
+    canDeActivateInputPage(): boolean {
+        return confirm("ページを離れてもいい？？");
+    }
+
+    allControlReCheck() {
+        for (const field in this.formErrors) {
+            const control = this.inputForm.controls[field];
+            control.markAsDirty();
+            this.onValueChange();
+        }
+    }
 }
