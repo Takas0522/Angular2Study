@@ -173,6 +173,7 @@
     </Content>
     <Content Include="karma.conf.js" />
     <Content Include="src\app\app.component.html" />
+    <Content Include="src\app\csvexport\csvexport.html" />
     <Content Include="src\index.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -215,6 +216,8 @@
     <TypeScriptCompile Include="src\app\app.component.spec.ts" />
     <TypeScriptCompile Include="src\app\app.component.ts" />
     <TypeScriptCompile Include="src\app\app.module.ts" />
+    <TypeScriptCompile Include="src\app\common\webapi.ts" />
+    <TypeScriptCompile Include="src\app\csvexport\csvexport.component.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="src\polyfills.ts" />
     <TypeScriptCompile Include="src\vendor.ts" />

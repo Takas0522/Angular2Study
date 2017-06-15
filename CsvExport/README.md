@@ -1,19 +1,55 @@
-# 詳細
+# CSVをエクスポートする時に色々したこと。
 
-http://takasdev.hatenablog.com/entry/2017/02/19/115026
+業務用のアプリケーション作ってるときに大概あるのがCSV出力ですが
 
-# 参考
+WEBでCSV出力するときに、ちょいとはまったのでメモがてらに記事投稿します。
 
-https://angular.io/docs/ts/latest/cookbook/visual-studio-2015.html
+# エクスポートしたCSVどうやってWEBで受け取るの？
 
-https://angular.io/docs/ts/latest/guide/webpack.html
+すごく単純な方法だとHTTPのリクエストを飛ばすだけです。
 
-http://stackoverflow.com/questions/42213631/errors-while-using-webpack
+``` typescript
+window.location.href = "CSVを出力するAPIのURL";
+```
 
-https://github.com/madskristensen/NpmTaskRunner/issues/47
+CSVのレスポンスがあれば勝手にDLが始まります。
 
-http://kiyokura.hateblo.jp/entry/2015/10/13/224800
+CSVのエクスポートはChromeとかだと問題ないのですが
 
-http://stackoverflow.com/questions/38112891/set-base-href-dynamically-angular-2
+IEとかEdgeとかだと、utf-8のFormatでDLしようとしやがるので文字化けします。
 
-http://stackoverflow.com/questions/39287444/angular2-how-to-get-app-base-href-programatically
+こんな感じで…
+
+
+あと、上記の方法だとビジネスロジックのエラー発生時にハンドリングしづらいです。
+
+# 対策
+
+受け取ったCSVデータからBLOBオブジェクトを生成
+
+そいつに名前をつけてやる形で日本語名称の文字化けを解消します。
+
+TypeScriptのAPIの受け口は下記のように作ります。
+
+参考
+https://github.com/angular/angular/issues/14083
+
+
+readyStateが完了したとき（＝４）、どのような状態で返却されたかによってresponseTypeを決定します。
+
+(BLOBのままだとresponseTextでエラー吐いて使えないですからね)
+
+WebAPI側では、ビジネスロジックエラーが発生した場合、InternalServerErrorのステータスで返却しています。
+
+BLOB化したあとはCSVファイルとしてDLさせます。IE系列とそれ以外とでロジックがちがうので
+
+下記のような感じなります。
+
+
+# 結果
+
+こんな感じで動作します。
+
+# 最後に
+
+今回作成したソースは下記リポジトリで管理しています。
