@@ -5,6 +5,13 @@
   margin-top: 50px;
   display: block; }
 
+.video-content {
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid black;
+  vertical-align: middle;
+  background-color: #ecf0f1; }
+
 body {
   background: #fff;
   color: #000; }

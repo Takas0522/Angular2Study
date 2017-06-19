@@ -1,0 +1,12 @@
+<h1>
+  {{title}}
+</h1>
+<div>
+  <span tooltip="Hello there! I was triggered manually"
+        triggers="" #pop="bs-tooltip">
+  This text has attached tooltip
+  </span>
+  <button 
+    class = "btn btn-default"
+    (click)="onClickButton()">Show Tooltip</button>
+</div>

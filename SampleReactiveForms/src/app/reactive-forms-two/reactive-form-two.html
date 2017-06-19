@@ -1,0 +1,28 @@
+<form 
+    [formGroup]="inputForm"
+    (ngSubmit)="onSubmit()">
+    <div>
+        <md-input-container>
+            <input 
+                mdInput 
+                [placeholder]="FIRST_NAME_CONTROL_SHOW_NAME" 
+                [formControlName]="FIRST_NAME_CONTROL_KEYWORD">
+            <md-error>
+                {{formErrors[FIRST_NAME_CONTROL_KEYWORD]}}
+            </md-error>
+        </md-input-container>
+    </div>
+    <div>
+        <md-input-container>
+            <input 
+                mdInput 
+                [placeholder]="LAST_NAME_CONTROL_SHOW_NAME" 
+                type="password" 
+                [formControlName]="LAST_NAME_CONTROL_KEYWORD">
+            <md-error>
+                {{formErrors[LAST_NAME_CONTROL_KEYWORD]}}
+            </md-error>
+        </md-input-container>
+    </div>
+    <button md-raised-button type="subbmit">subbmit</button>
+</form>

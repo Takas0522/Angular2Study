@@ -29,7 +29,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 # エンプラ脳で考えるReactiveForms
 
-AngularのReactiveFormsは強力で柔軟性のあるFormModuleだと思います。
+AngularのReactiveFormsは素敵なFormModuleだと思います。
 
 自分も実際の作業の際には非常にお世話になりました。
 
@@ -42,6 +42,8 @@ https://angular.io/docs/ts/latest/cookbook/form-validation.html
 Angularの公式サイトが大変参考になります。
 
 基本のキは、上記サイトで学習できるので、エンプラ脳でReactiveFormsの利用方法を考えてみようと思います。
+
+記事作成当時のAngularはV4です。
 
 # Formでほしい機能を考える
 
@@ -64,113 +66,87 @@ Angularの公式サイトが大変参考になります。
 
 ただ、各画面で共通した機能として作りたいので、ReactiveFormsをもつComponentのBaseClassを作成します。
 
-``` typescript
-export class BaseComponent {
-    inputForm: FormGroup;
-    formSettings: any;
-    formErrors: any;
-    validationMessage: any;
 
-    constructor(
-        private fb: FormBuilder
-    ) {}
 
-    buildForms() {
-        this.fb.group(this.formSettings);
-        this.inputForm.valueChanges.subscribe(data => {
-            this.onValueChange(data);
-        });
-    }
-
-    onValueChange(data?: any) {
-        const form = this.inputForm;
-        for(const field in this.formErrors){
-            /* Initialize form's Errors */
-            this.formErrors[field] = '';
-            const control = form.get(field);
-            if (control && control.dirty && !control.valid) {
-                const messages = this.validationMessage[field];
-                for (const key in control.errors){
-                    this.formErrors[field] += messages[key];
-                }
-                this.emitErrorAction(field);
-            }
-            if (control && control.dirty && control.valid) {
-                this.emitNotErrorAction(field);
-            }
-        }
-    }
-
-    emitErrorAction(field: any) {
-        /* エラー発生時処理、継承先で実装 */
-    }
-
-    emitNotErrorAction(field: any){
-        /* エラー未発生時処理、継承先で実装 */
-    }
-}
-```
-
-Validationの設定を全部Componentに書いていくのも邪魔くさいので
+また、各ApplicationでValidationの設定を全部Componentに書いていくのも邪魔くさいので
 
 ファイルを切って設定をモジュール化します。
 
-``` typescript
-export const USER_NAME_CONTROL_KEYWORD = 'username';
-export const USER_NAME_CONTROL_SHOW_NAME = 'ユーザー名';
-export const USER_NAME_MAX_LENGTH = 20;
 
-export const USER_ID_CONTROL_KEYWORD = 'userid';
-export const USER_ID_CONTROL_SHOW_NAME = 'ユーザID';
-export const USER_ID_MAX_LENGTH = 10;
-
-export const PASSWORD_CONTROL_KEYWORD = 'password';
-export const PASSWOED_CONTROL_SHOW_NAME = 'パスワード';
-export const PASSWORD_MAX_LENGTH = 8;
-
-export const FORM_SETTING = {
-    [USER_NAME_CONTROL_KEYWORD]:['', 
-        [
-            Validators.maxLength(USER_NAME_MAX_LENGTH)
-        ]
-    ],
-    [USER_ID_CONTROL_KEYWORD]:['', 
-        [
-            Validators.required,
-            Validators.maxLength(USER_ID_MAX_LENGTH)
-        ]
-    ],
-    [PASSWORD_CONTROL_KEYWORD]:['', 
-        [
-            Validators.required,
-            Validators.maxLength(PASSWORD_MAX_LENGTH)
-        ]
-    ]
-}
-
-export const FORM_ERRORS = {
-    [USER_NAME_CONTROL_KEYWORD]:'',
-    [USER_ID_CONTROL_KEYWORD]:'',
-    [PASSWORD_CONTROL_KEYWORD]:''
-}
-
-const REQUIRED = 'required';
-const MAXLEMGTH = 'maxlength';
-
-export const VALIDATION_MESSAGES = {
-    [USER_NAME_CONTROL_KEYWORD]: {
-        [MAXLEMGTH]: ValidarionMessages.getMaxLengthMessage(USER_NAME_CONTROL_SHOW_NAME, USER_NAME_MAX_LENGTH)
-    },
-    [USER_ID_CONTROL_KEYWORD]: {
-        [REQUIRED]: ValidarionMessages.getRequredMessage(USER_ID_CONTROL_SHOW_NAME),
-        [MAXLEMGTH]: ValidarionMessages.getMaxLengthMessage(USER_ID_CONTROL_SHOW_NAME, USER_ID_MAX_LENGTH)
-    },
-    [PASSWORD_CONTROL_KEYWORD]: {
-        [REQUIRED]: ValidarionMessages.getRequredMessage(PASSWOED_CONTROL_SHOW_NAME),
-        [MAXLEMGTH]: ValidarionMessages.getMaxLengthMessage(PASSWOED_CONTROL_SHOW_NAME, PASSWORD_MAX_LENGTH)
-    }
-}
-
-```
 
 作成するComponentでBaseComponentを継承し、作成したValidarionのセッティングを読み込みます。
+
+BaseComponentで、ValidationCheckに必要な作業をほぼ行っているので
+
+実際のComponentに記述する量はガクッと減るかと思います。
+
+getterでValidationSettingのコントロール名を返しているのは
+
+ComponentのHtml内で使用するためです。
+
+HTMLは下記のような作りになっています。
+
+[formControl]となっているのが地味な味噌ですね。
+
+ValidationSettingで設定している値を変更すると
+
+関連項目のすべてに適用されるため
+
+「DBの項目名称と一致してなかったテヘペロ」って場合も
+
+最小限の変更で適切な箇所に変更を波及させることができます。
+
+エラーメッセージについては、
+
+「必須ですよ」とか「文字列Overですよ」とか一般的なエラー内容は集約して管理したいので
+
+
+# エラーメッセージ
+
+エラーメッセージ生成Classを作成しました。
+
+Static宣言してnewなしで使えるようにしています。
+
+# ページ遷移時の処理
+
+入力中にページ遷移する場合、「いいの？」ってダイアログ出したい時があります。
+
+そんな場合は、RoouterのDeactivateRouterを使用するのが良いですね。
+
+下記の感じで作成しました。
+
+
+DeactivateGuardを使用する際にGenerics<T>にComponent型を突っ込みます。
+
+その際、BaseComponentを継承して作成されたComponentと指定することで
+
+Activate判断処理において、Component内の処理を呼び出せるようにします。
+
+Componentの「canDeActivateInputPage」処理では、独自のダイアログをだすなり
+
+何かの条件のときのみ確認するなり、よしなに処理を実装することができます。
+
+今回はBaseComponentに処理を記述しましたが、もちろん、継承先のComponentごとに実装をバラすこともできます。
+
+Routerは下記のように設定します。
+
+# データ確定時の処理
+
+初っ端開いた状態だと、formはCleanな状態です。
+
+Submitが走るとエラー状態にはなるものの
+
+ValueChangeイベントが走らないため、FormsErrorsにエラー内容が格納されません。
+
+なので、内部の全項目をDirty状態にして、ValidationCheckをあえて走らせる処理を実装します。
+
+# あとは複製…
+
+ValidationSettingとHtmlとComponentについては
+
+画面に設定する項目に関するものだけを変更すれば、新しい画面が比較的ラクに作れるようになります。
+
+# 最後に
+
+今回作成したソースは下記リポジトリで管理しています。
+

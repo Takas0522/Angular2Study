@@ -1,10 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
+import { Router } from "@angular/router";
 import { BaseComponent } from "../base/base.component";
 import * as validSettings from "./validation-settings";
 
 @Component({
-    templateUrl: "./reactive-firm-one.html",
+    templateUrl: "./reactive-form-one.html",
 })
 export class ReactiveFormOne extends BaseComponent implements OnInit {
     
@@ -12,7 +13,8 @@ export class ReactiveFormOne extends BaseComponent implements OnInit {
     validationMessage = validSettings.VALIDATION_MESSAGES;
 
     constructor(
-        private _fb: FormBuilder
+        private _fb: FormBuilder,
+        private _router: Router
     ){
         super();
     }
@@ -34,5 +36,14 @@ export class ReactiveFormOne extends BaseComponent implements OnInit {
     buildForms() {
         this.inputForm = this._fb.group(validSettings.FORM_SETTING);
         super.buildForms();
+    }
+
+    onSubmit() {
+        this.allControlReCheck();
+        if (this.inputForm.invalid) {
+            alert('えらーあるよ！')
+        } else {
+            this._router.navigate(["empty"]);
+        }
     }
 }
