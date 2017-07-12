@@ -1,0 +1,21 @@
+{
+  "name": "Angular 2 Study Progressive Web Apps",
+  "short_name": "Angular 2 PWA",
+  "icons": [
+    {
+      "src": "assets/icons/image-192x192.png",
+      "sizes": "192x192",
+      "type": "image\/png"
+    },
+    {
+      "src": "assets/icons/image-256x256.png",
+      "sizes": "256x256",
+      "type": "image\/png"
+    }
+  ],
+  "theme_color": "#b92b27",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "./?utm_source=web_app_manifest"
+}
