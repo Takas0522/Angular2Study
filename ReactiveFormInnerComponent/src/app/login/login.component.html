@@ -1,0 +1,13 @@
+<form [formGroup]="inputForm">
+  <app-user-id-text [fg]="inputForm"></app-user-id-text>
+  <label style="color:red" *ngIf="formErrors[USER_ID_KEYWORD]">{{formErrors[USER_ID_KEYWORD]}}</label>
+  <br/>
+  <input [formControlName]="PASSWORD_KEYWORD" placeholder="パスワード" /><br>
+  <label style="color:red" *ngIf="formErrors[PASSWORD_KEYWORD]">{{formErrors[PASSWORD_KEYWORD]}}</label>
+</form>
+<br>
+inputForm.Value内
+<br>
+USERID(子Component):{{inputForm.value[USER_ID_KEYWORD]}}
+<br>
+PASSWORD:{{inputForm.value[PASSWORD_KEYWORD]}}
